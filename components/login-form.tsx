@@ -4,7 +4,7 @@ import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Loader2 } from "lucide-react"
+import { Loader2, Home } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
@@ -43,6 +43,18 @@ export default function LoginForm() {
 
   return (
     <div className="w-full max-w-md space-y-8">
+      <div className="flex justify-center">
+        <Link href="/">
+          <Button
+            variant="outline"
+            className="bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white"
+          >
+            <Home className="mr-2 h-4 w-4" />
+            Back to Homepage
+          </Button>
+        </Link>
+      </div>
+
       <div className="space-y-2 text-center">
         <h1 className="text-4xl font-semibold tracking-tight text-white">Welcome back</h1>
         <p className="text-lg text-gray-400">Sign in to your DJ Hub account</p>

@@ -28,8 +28,8 @@ export async function updateSession(request: NextRequest) {
   if (code) {
     // Exchange the code for a session
     await supabase.auth.exchangeCodeForSession(code)
-    // Redirect to home page after successful auth
-    return NextResponse.redirect(new URL("/", request.url))
+    // Redirect to dashboard after successful auth
+    return NextResponse.redirect(new URL("/dashboard", request.url))
   }
 
   // Refresh session if expired - required for Server Components
@@ -41,14 +41,22 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/auth/sign-up") ||
     request.nextUrl.pathname === "/auth/callback"
 
-  if (!isAuthRoute) {
+  const isDashboardRoute = request.nextUrl.pathname.startsWith("/dashboard")
+  const isApiRoute = request.nextUrl.pathname.startsWith("/api") && !request.nextUrl.pathname.startsWith("/api/auth")
+
+  if (isDashboardRoute || isApiRoute) {
     const {
       data: { session },
     } = await supabase.auth.getSession()
 
     if (!session) {
-      const redirectUrl = new URL("/auth/login", request.url)
-      return NextResponse.redirect(redirectUrl)
+      if (isDashboardRoute) {
+        const redirectUrl = new URL("/auth/login", request.url)
+        return NextResponse.redirect(redirectUrl)
+      } else {
+        // For API routes, return 401
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      }
     }
   }
 
