@@ -135,11 +135,11 @@ export function TopNavigation({ showSearch = true, isLoggedIn = false }: TopNavi
               </>
             ) : (
               <>
-                <Button variant="ghost" size="sm">
-                  Sign In
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/auth/login">Sign In</Link>
                 </Button>
                 <Button size="sm" asChild>
-                  <Link href="/dashboard">Get Started</Link>
+                  <Link href="/auth/sign-up">Get Started</Link>
                 </Button>
               </>
             )}

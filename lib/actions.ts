@@ -52,7 +52,6 @@ export async function signUp(prevState: any, formData: FormData) {
   const supabase = createClient()
 
   try {
-    // First check if username is already taken
     const { data: existingUser } = await supabase
       .from("users")
       .select("username")
@@ -61,6 +60,12 @@ export async function signUp(prevState: any, formData: FormData) {
 
     if (existingUser) {
       return { error: "Username is already taken" }
+    }
+
+    const { data: existingEmail } = await supabase.from("users").select("email").eq("email", email.toString()).single()
+
+    if (existingEmail) {
+      return { error: "An account with this email already exists. Please try logging in instead." }
     }
 
     // Sign up the user
@@ -78,15 +83,21 @@ export async function signUp(prevState: any, formData: FormData) {
       return { error: authError.message }
     }
 
-    // Create user profile if auth was successful
     if (authData.user) {
-      const { error: profileError } = await supabase.from("users").insert({
-        id: authData.user.id,
-        email: email.toString(),
-        username: username.toString(),
-        display_name: displayName?.toString() || username.toString(),
-        is_dj: true,
-      })
+      const { error: profileError } = await supabase.from("users").upsert(
+        {
+          id: authData.user.id,
+          email: email.toString(),
+          username: username.toString(),
+          display_name: displayName?.toString() || username.toString(),
+          is_dj: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        {
+          onConflict: "email",
+        },
+      )
 
       if (profileError) {
         console.error("Profile creation error:", profileError)
